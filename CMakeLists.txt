@@ -4,6 +4,7 @@ project (cyclops)
 find_package(Tcmalloc)
 find_package(Threads)
 find_package(OpenSSL)
+find_package(OpenCV REQUIRED)
 
 if(OPENSSL_FOUND)
   include_directories(${OPENSSL_INCLUDE_DIR})
@@ -19,12 +20,14 @@ else()
     find_package( Boost 1.52 COMPONENTS system thread REQUIRED )
 endif()
 
-include_directories( ${Boost_INCLUDE_DIR} )
-
 set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 
 include_directories("${PROJECT_INCLUDE_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}")
+include_directories( ${Boost_INCLUDE_DIR} )
+
+include_directories(/usr/local/include)
+link_directories(/usr/local/lib)
 
 set(CMAKE_BUILD_TYPE "Release")
 
@@ -34,4 +37,5 @@ target_link_libraries(
     cyclops
     ${CMAKE_THREAD_LIBS_INIT}
     ${Boost_LIBRARIES}
+    ${OpenCV_LIBRARIES}
 )
