@@ -1,8 +1,10 @@
 #include <string>
+#include <mutex>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
+
 
 class Detector
 {
@@ -18,4 +20,5 @@ class Detector
     private:
         cv::Mat m_resized;
         cv::Size m_size;
+        std::mutex m_mutex;
 };
