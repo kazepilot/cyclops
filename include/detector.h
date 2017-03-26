@@ -4,7 +4,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
-
+#include "json11.hpp"
 
 class Detector
 {
@@ -15,7 +15,7 @@ class Detector
                  float threshold,
                  float hier_threshold,
                  float nms);
-        std::string detect(cv::Mat image);
+        std::vector<json11::Json::object> detect(const cv::Mat image);
 
     private:
         cv::Mat m_resized;

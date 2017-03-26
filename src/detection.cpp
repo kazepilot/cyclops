@@ -26,7 +26,7 @@ Detection::Detection(std::string line)
     stream >> probability;
 }
 
-json11::Json Detection::to_json() const
+json11::Json::object Detection::to_json()
 {
     return json11::Json::object {
         { "name", name },

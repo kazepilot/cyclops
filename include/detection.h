@@ -17,5 +17,5 @@ class Detection
               float bottom, float right, float probability);
 
     Detection(std::string line);
-    json11::Json to_json() const;
+    json11::Json::object to_json();
 };

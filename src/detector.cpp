@@ -3,7 +3,6 @@
 #include <sstream>
 
 #include "detector.h"
-#include "json11.hpp"
 #include "detection.h"
 
 Detector::Detector(std::string datacfg,
@@ -18,7 +17,7 @@ Detector::Detector(std::string datacfg,
         m_size = cv::Size(416, 416);
     }
 
-std::string Detector::detect(cv::Mat image)
+std::vector<json11::Json::object> Detector::detect(const cv::Mat image)
 {
     char *results = calloc(1, 1000 * sizeof(char));
     int height = image.rows;
@@ -34,14 +33,14 @@ std::string Detector::detect(cv::Mat image)
     free(results);
 
     std::string line;
-    std::vector<Detection> detections;
+    std::vector<json11::Json::object> detections;
     Detection detection;
     std::stringstream ss(str);
 
     while (std::getline(ss, line))
     {
         detection = Detection(line);
-        detections.push_back(detection);
+        detections.push_back(detection.to_json());
     }
-    return json11::Json(detections).dump();
+    return detections;
 }
