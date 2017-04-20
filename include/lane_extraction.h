@@ -9,7 +9,7 @@ class LaneExtractor
 {
     public:
         LaneExtractor() { }
-        std::vector<json11::Json::object> extract(const cv::Mat image);
+        void extract(const cv::Mat image, std::vector<json11::Json::object> &results_json);
 
     private:
         cv::Point line_function(cv::Point p1, cv::Point p2);

@@ -15,7 +15,7 @@ class Detector
                  float threshold,
                  float hier_threshold,
                  float nms);
-        std::vector<json11::Json::object> detect(const cv::Mat image);
+        void detect(const cv::Mat image, std::vector<json11::Json::object> &results_json);
 
     private:
         cv::Mat m_resized;

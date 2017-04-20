@@ -17,7 +17,7 @@ Detector::Detector(std::string datacfg,
         m_size = cv::Size(416, 416);
     }
 
-std::vector<json11::Json::object> Detector::detect(const cv::Mat image)
+void Detector::detect(const cv::Mat image, std::vector<json11::Json::object> &results_json)
 {
     char *results = calloc(1, 1000 * sizeof(char));
     int height = image.rows;
@@ -33,14 +33,12 @@ std::vector<json11::Json::object> Detector::detect(const cv::Mat image)
     free(results);
 
     std::string line;
-    std::vector<json11::Json::object> detections;
     Detection detection;
     std::stringstream ss(str);
 
     while (std::getline(ss, line))
     {
         detection = Detection(line);
-        detections.push_back(detection.to_json());
+        results_json.push_back(detection.to_json());
     }
-    return detections;
 }

@@ -2,13 +2,12 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
+#include <thread>
 
 #include "crow_all.h"
 #include "json11.hpp"
 #include "detector.h"
 #include "lane_extraction.h"
-
-#include <iostream>
 
 int main()
 {
@@ -25,23 +24,24 @@ int main()
     ([&](const crow::request& req)
     {
         std::vector<unsigned char> encoded(req.body.begin(), req.body.end());
-
         cv::Mat image = cv::imdecode(cv::Mat(encoded), 1);
-        std::vector<json11::Json::object> detections = detector.detect(image);
-        std::cout << "Detector finished\n";
-        std::vector<json11::Json::object> extractions = extractor.extract(image);
-        std::cout << "Extractor finished\n";
-        json11::Json::object results = json11::Json::object {
-            { "objects", detections },
-            { "road", extractions }
-        };
+        std::vector<json11::Json::object> detections;
+        detector.detect(image, detections);
 
-        std::cout << "Merged objects\n";
+        json11::Json::object results = json11::Json::object {
+            { "objects", detections }
+        };
 
         return json11::Json(results).dump();
     });
 
-    app.port(1234)
+    CROW_ROUTE(app, "/hello")
+    .name("hello")
+    ([]{
+        return "Hello World!";
+    });
+
+    app.port(80)
         .multithreaded()
         .run();
 }
