@@ -9,6 +9,48 @@
 #include "detector.h"
 #include "lane_extraction.h"
 
+class Cyclops
+{
+    public:
+        Cyclops(std::string datacfg, std::string cfgfile, std::string weights): 
+                m_detector(datacfg, cfgfile, weights, 0.1f, 0.5f, 0.4f)
+        {
+        }
+
+        void run()
+        {
+            CROW_ROUTE(m_app, "/cyclops")
+            .methods("POST"_method)
+            ([&](const crow::request& req)
+            {
+                std::vector<unsigned char> encoded(req.body.begin(), req.body.end());
+                cv::Mat image = cv::imdecode(cv::Mat(encoded), 1);
+                std::vector<json11::Json::object> detections;
+                m_detector.detect(image, detections);
+
+                json11::Json::object results = json11::Json::object {
+                    { "objects", detections }
+                };
+
+                return json11::Json(results).dump();
+            });
+
+            CROW_ROUTE(m_app, "/hello")
+            .name("hello")
+            ([]{
+                return "Hello World!";
+            });
+
+            m_app.port(80)
+                .multithreaded()
+                .run();
+        }
+
+    private:
+        crow::SimpleApp m_app;
+        Detector m_detector;
+};
+
 int main()
 {
     crow::SimpleApp app;
@@ -16,32 +58,8 @@ int main()
     std::string cfgfile = "/home/evaldas/cyclops/cyclops.cfg";
     std::string weights = "/home/evaldas/cyclops/cyclops.weights";
 
-    Detector detector(datacfg, cfgfile, weights, 0.1, 0.5, 0.4);
-    LaneExtractor extractor;
+    Cyclops cyclops(datacfg, cfgfile, weights);
+    cyclops.run();
 
-    CROW_ROUTE(app, "/cyclops")
-    .methods("POST"_method)
-    ([&](const crow::request& req)
-    {
-        std::vector<unsigned char> encoded(req.body.begin(), req.body.end());
-        cv::Mat image = cv::imdecode(cv::Mat(encoded), 1);
-        std::vector<json11::Json::object> detections;
-        detector.detect(image, detections);
-
-        json11::Json::object results = json11::Json::object {
-            { "objects", detections }
-        };
-
-        return json11::Json(results).dump();
-    });
-
-    CROW_ROUTE(app, "/hello")
-    .name("hello")
-    ([]{
-        return "Hello World!";
-    });
-
-    app.port(80)
-        .multithreaded()
-        .run();
+    
 }
